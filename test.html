@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="wasm_exec.js"></script>
+    <script>
+        const go = new Go();
+
+        const iterations = 100000000
+ 
+        WebAssembly.instantiateStreaming(fetch('./go-web/add.wasm'), 
+            go.importObject).then((result) => {
+            go.run(result.instance);
+            console.log("----------------------------")
+            console.log("Result add function:", add(2, 3)); // call the 'add' function defined in the Go program
+            console.log("Result getNameObj function:", getUserObj("Joe", 34));
+            console.log("Result of binary data: ", returnBinaryData());
+            console.log("Result o Pi calculation from Golang: ", calculatePi(iterations));
+            console.log("----------------------------")
+        });
+
+        function calculatePi(iterations) {
+            let start = performance.now();
+
+            let pi = 0.0;
+            for (let i = 0; i < iterations; i++) {
+                // The Leibniz formula alternates between addition and subtraction
+                // depending on the term index (i).
+                let sign = 1.0;
+                if (i % 2 === 1) {
+                    sign = -1.0;
+                }
+
+                // Calculate the current term
+                let term = 1.0 / (2 * i + 1);
+                pi += sign * term;
+            }
+
+            // Multiply by 4 to get the value of pi
+            pi *= 4.0;
+
+            let end = performance.now();
+            let elapsed = end - start;
+            console.log("Calculation time javascript:", elapsed, "ms");
+
+            return pi;
+        }
+
+        // Example usage:
+        let result = calculatePi(iterations);
+        console.log("Pi from javascript:", result);
+    </script>
+</head>
+<body>
+
+    Teste WebAssembly
+
+</body>
+</html>
